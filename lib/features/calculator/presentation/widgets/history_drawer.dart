@@ -28,7 +28,6 @@ class HistoryDrawer extends StatelessWidget {
               builder: (context, controller, child) {
                 return Column(
                   children: [
-                    // Header
                     Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Row(
@@ -53,10 +52,7 @@ class HistoryDrawer extends StatelessWidget {
                         ],
                       ),
                     ),
-
                     const Divider(height: 1),
-
-                    // History List
                     Expanded(
                       child: controller.history.isEmpty
                           ? Center(
@@ -111,8 +107,6 @@ class HistoryDrawer extends StatelessWidget {
                               },
                             ),
                     ),
-
-                    // Clear History Button
                     if (controller.history.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.all(20),
@@ -120,7 +114,55 @@ class HistoryDrawer extends StatelessWidget {
                           width: double.infinity,
                           child: ElevatedButton.icon(
                             onPressed: () {
-                              controller.clearHistory();
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: isDark
+                                        ? const Color(0xFF2C2C2E)
+                                        : Colors.white,
+                                    title: Text(
+                                      'Clear History?',
+                                      style: GoogleFonts.outfit(
+                                        color: displayTextColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    content: Text(
+                                      'This action cannot be undone.',
+                                      style: GoogleFonts.outfit(
+                                        color: secondaryTextColor,
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text(
+                                          'Cancel',
+                                          style: GoogleFonts.outfit(
+                                            color: displayTextColor,
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text(
+                                          'Clear',
+                                          style: GoogleFonts.outfit(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          controller.clearHistory();
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             },
                             icon: const Icon(Icons.delete_outline),
                             label: Text(

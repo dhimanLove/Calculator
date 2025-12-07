@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/theme_provider.dart';
+import 'features/calculator/data/repositories/calculator_repository_impl.dart';
+import 'features/calculator/domain/repositories/calculator_repository.dart';
 import 'features/calculator/domain/usecases/calculate_expression_usecase.dart';
 import 'features/calculator/presentation/manager/calculator_controller.dart';
 import 'features/calculator/presentation/pages/calculator_screen.dart';
@@ -9,7 +11,6 @@ import 'features/calculator/presentation/pages/calculator_screen.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -28,7 +29,13 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        Provider(create: (_) => CalculateExpressionUseCase()),
+        Provider<CalculatorRepository>(
+            create: (_) => CalculatorRepositoryImpl()),
+        Provider<CalculateExpressionUseCase>(
+          create: (context) => CalculateExpressionUseCase(
+            context.read<CalculatorRepository>(),
+          ),
+        ),
         ChangeNotifierProvider(
           create: (context) => CalculatorController(
             context.read<CalculateExpressionUseCase>(),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../manager/calculator_controller.dart';
@@ -26,13 +25,8 @@ class CalculatorScreen extends StatelessWidget {
               builder: (context, controller, child) {
                 return Column(
                   children: [
-                    // Top Bar
                     _buildTopBar(context, themeProvider, controller, isDark),
-
-                    // Display Area
                     _buildDisplay(context, controller, isDark),
-
-                    // Keypad Area
                     Expanded(
                       child: _buildKeypad(context, controller, isDark),
                     ),
@@ -56,7 +50,6 @@ class CalculatorScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Theme Toggle (Left)
           IconButton(
             icon: Icon(
               isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
@@ -66,8 +59,6 @@ class CalculatorScreen extends StatelessWidget {
             onPressed: () => themeProvider.toggleTheme(),
             tooltip: isDark ? 'Light Mode' : 'Dark Mode',
           ),
-
-          // History Button (Right)
           IconButton(
             onPressed: () {
               Scaffold.of(context).openEndDrawer();
@@ -92,41 +83,51 @@ class CalculatorScreen extends StatelessWidget {
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+      height:
+          240, // Increased fixed height for display area to reduce keypad height
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       alignment: Alignment.bottomRight,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // Expression
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            reverse: true,
-            child: Text(
-              controller.userQuestion.isEmpty ? '' : controller.userQuestion,
-              style: GoogleFonts.outfit(
-                fontSize: 40,
-                color: expressionTextColor,
-                fontWeight: FontWeight.w300,
+          Flexible(
+            flex: 1,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
+              child: Text(
+                controller.userQuestion.isEmpty ? '' : controller.userQuestion,
+                style: TextStyle(
+                  fontFamily: 'Chillax',
+                  fontSize: 40, // Base font size
+                  color: expressionTextColor,
+                  fontWeight: FontWeight.w300,
+                  height: 1.2,
+                ),
+                textAlign: TextAlign.right,
               ),
-              textAlign: TextAlign.right,
             ),
           ),
-          const SizedBox(height: 12),
-          // Result
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            reverse: true,
-            child: Text(
-              controller.userAnswer.isEmpty
-                  ? (controller.userQuestion.isEmpty ? '0' : '')
-                  : controller.userAnswer,
-              style: GoogleFonts.outfit(
-                fontSize: 72,
-                color: displayTextColor,
-                fontWeight: FontWeight.w300,
+          const SizedBox(height: 8),
+          Flexible(
+            flex: 2,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
+              child: Text(
+                controller.userAnswer.isEmpty
+                    ? (controller.userQuestion.isEmpty ? '0' : '')
+                    : controller.userAnswer,
+                style: TextStyle(
+                  fontFamily: 'Chillax',
+                  fontSize: 70, // Base font size
+                  color: displayTextColor,
+                  fontWeight: FontWeight.w300,
+                  height: 1.1,
+                ),
+                textAlign: TextAlign.right,
               ),
-              textAlign: TextAlign.right,
             ),
           ),
         ],
@@ -136,13 +137,12 @@ class CalculatorScreen extends StatelessWidget {
 
   Widget _buildKeypad(
       BuildContext context, CalculatorController controller, bool isDark) {
-    // iOS-style 4-column Layout
     final buttons = [
-      ['AC', '±', '%', '÷'],
+      ['AC', 'C', '%', '÷'],
       ['7', '8', '9', '×'],
       ['4', '5', '6', '-'],
       ['1', '2', '3', '+'],
-      ['0', '.', '='], // Special row with 0 spanning 2 columns
+      ['0', '.', '='],
     ];
 
     return Container(
@@ -159,7 +159,7 @@ class CalculatorScreen extends StatelessWidget {
 
           return Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
+              padding: const EdgeInsets.symmetric(vertical: 1),
               child: Row(
                 children: _buildRowButtons(
                   context,
@@ -188,7 +188,6 @@ class CalculatorScreen extends StatelessWidget {
     for (int i = 0; i < row.length; i++) {
       final buttonText = row[i];
 
-      // Special handling for "0" button - spans 2 columns
       if (buttonText == '0' && isLastRow) {
         buttons.add(
           Expanded(
@@ -218,28 +217,24 @@ class CalculatorScreen extends StatelessWidget {
   }) {
     Color bgColor;
     Color txtColor;
-    double fontSize = 36;
+    double fontSize = 35;
 
-    // Determine colors based on button type - iOS style
     bool isOperator = ['÷', '×', '-', '+', '='].contains(buttonText);
-    bool isFunction = ['AC', '±', '%'].contains(buttonText);
+    bool isFunction = ['AC', 'C', '%'].contains(buttonText);
 
     if (isOperator) {
-      // Operators get vibrant orange background with white text
       bgColor =
           isDark ? AppColors.darkButtonOperator : AppColors.lightButtonOperator;
       txtColor =
           isDark ? AppColors.darkTextOperator : AppColors.lightTextOperator;
-      fontSize = 40; // Slightly larger for operators
+      fontSize = 35;
     } else if (isFunction) {
-      // Functions (AC, ±, %) get light gray background
       bgColor =
           isDark ? AppColors.darkButtonFunction : AppColors.lightButtonFunction;
       txtColor =
           isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-      fontSize = 32;
+      fontSize = buttonText == 'AC' ? 31 : 35;
     } else {
-      // Numbers and decimal point get dark gray (dark mode) or light gray (light mode)
       bgColor =
           isDark ? AppColors.darkButtonNumber : AppColors.lightButtonNumber;
       txtColor =

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CalculatorButton extends StatelessWidget {
   final String text;
@@ -23,24 +22,32 @@ class CalculatorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final buttonRadius = isCompact ? 18.0 : 40.0;
-    final buttonPadding = isCompact ? 5.0 : 6.0;
+    final buttonSize = isCompact ? 40.0 : 100.0;
+    final buttonRadius = buttonSize / 2;
+    final buttonPadding = isCompact ? 8.0 : 12.0;
 
     return Padding(
       padding: EdgeInsets.all(buttonPadding),
       child: Material(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(buttonRadius),
-        elevation: 0,
+        shape: isWide
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(buttonRadius))
+            : const CircleBorder(),
+        elevation: 3,
         child: InkWell(
           onTap: onPressed,
-          borderRadius: BorderRadius.circular(buttonRadius),
+          customBorder: isWide
+              ? RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(buttonRadius))
+              : const CircleBorder(),
           splashColor: Colors.white.withValues(alpha: 0.15),
           highlightColor: Colors.white.withValues(alpha: 0.08),
           child: Container(
-            height: isCompact ? null : 80,
+            height: buttonSize,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(buttonRadius),
+              shape: isWide ? BoxShape.rectangle : BoxShape.circle,
+              borderRadius: isWide ? BorderRadius.circular(buttonRadius) : null,
             ),
             child: Center(
               child: Padding(
@@ -51,11 +58,15 @@ class CalculatorButton extends StatelessWidget {
                   alignment: isWide ? Alignment.centerLeft : Alignment.center,
                   child: Text(
                     text,
-                    style: GoogleFonts.outfit(
-                      color: textColor,
-                      fontSize: fontSize ?? (isCompact ? 22 : 36),
+                    style: const TextStyle(
+                      fontFamily: 'Chillax',
+                      color: Colors.white,
+                      fontSize: 32,
                       fontWeight: FontWeight.w400,
                       letterSpacing: 0,
+                    ).copyWith(
+                      color: textColor,
+                      fontSize: fontSize ?? (isCompact ? 20 : 32),
                     ),
                   ),
                 ),

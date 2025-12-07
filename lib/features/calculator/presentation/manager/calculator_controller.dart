@@ -27,11 +27,10 @@ class CalculatorController extends ChangeNotifier {
 
   void onButtonPressed(String buttonText) {
     if (buttonText == 'AC') {
-      // iOS-style AC - just clears current input
       _userQuestion = '';
       _userAnswer = '';
-    } else if (buttonText == '±') {
-      _toggleSign();
+    } else if (buttonText == 'C') {
+      _handleBackspace();
     } else if (buttonText == '=') {
       if (_userQuestion.isNotEmpty) {
         _userAnswer = _calculateUseCase(_userQuestion);
@@ -40,7 +39,6 @@ class CalculatorController extends ChangeNotifier {
         }
       }
     } else {
-      // If there's an answer and user starts typing a number, start fresh
       if (_userAnswer.isNotEmpty &&
           !_isOperator(buttonText) &&
           buttonText != '.') {
@@ -53,6 +51,16 @@ class CalculatorController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _handleBackspace() {
+    if (_userAnswer.isNotEmpty) {
+      // If there's an answer, clear it and keep the question
+      _userAnswer = '';
+    } else if (_userQuestion.isNotEmpty) {
+      // Delete one character from the question
+      _userQuestion = _userQuestion.substring(0, _userQuestion.length - 1);
+    }
+  }
+
   void _handleMemoryOperation(Function(double) operation) {
     if (_userAnswer.isNotEmpty && _userAnswer != 'Error') {
       final value = double.tryParse(_userAnswer);
@@ -60,7 +68,6 @@ class CalculatorController extends ChangeNotifier {
         operation(value);
       }
     } else if (_userQuestion.isNotEmpty) {
-      // Try to calculate current expression to store
       final result = _calculateUseCase(_userQuestion);
       if (result != 'Error') {
         final value = double.tryParse(result);
@@ -71,28 +78,12 @@ class CalculatorController extends ChangeNotifier {
     }
   }
 
-  void _toggleSign() {
-    if (_userAnswer.isNotEmpty && _userAnswer != 'Error') {
-      final value = double.tryParse(_userAnswer);
-      if (value != null) {
-        _userQuestion = (-value).toString();
-        _userAnswer = '';
-      }
-    } else if (_userQuestion.isNotEmpty) {
-      if (_userQuestion.startsWith('-')) {
-        _userQuestion = _userQuestion.substring(1);
-      } else {
-        _userQuestion = '-$_userQuestion';
-      }
-    }
-  }
-
   void _handleTrigFunction(String func) {
     if (_userAnswer.isNotEmpty && _userAnswer != 'Error') {
       final value = double.tryParse(_userAnswer);
       if (value != null) {
         double result;
-        final radians = value * math.pi / 180; // Convert to radians
+        final radians = value * math.pi / 180;
         switch (func) {
           case 'sin':
             result = math.sin(radians);
@@ -175,7 +166,6 @@ class CalculatorController extends ChangeNotifier {
         timestamp: DateTime.now(),
       ),
     );
-    // Keep only the last 4 records
     if (_history.length > 4) {
       _history.removeLast();
     }
