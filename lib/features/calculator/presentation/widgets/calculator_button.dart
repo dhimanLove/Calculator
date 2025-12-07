@@ -8,6 +8,7 @@ class CalculatorButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isCompact;
   final double? fontSize;
+  final bool isWide;
 
   const CalculatorButton({
     super.key,
@@ -17,41 +18,46 @@ class CalculatorButton extends StatelessWidget {
     required this.onPressed,
     this.isCompact = false,
     this.fontSize,
+    this.isWide = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final buttonRadius = isCompact ? 18.0 : 40.0;
+    final buttonPadding = isCompact ? 5.0 : 6.0;
+
     return Padding(
-      padding: EdgeInsets.all(isCompact ? 5.0 : 8.0),
+      padding: EdgeInsets.all(buttonPadding),
       child: Material(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(isCompact ? 18 : 28),
+        borderRadius: BorderRadius.circular(buttonRadius),
         elevation: 0,
         child: InkWell(
           onTap: onPressed,
-          borderRadius: BorderRadius.circular(isCompact ? 18 : 28),
+          borderRadius: BorderRadius.circular(buttonRadius),
           splashColor: Colors.white.withValues(alpha: 0.15),
           highlightColor: Colors.white.withValues(alpha: 0.08),
           child: Container(
+            height: isCompact ? null : 80,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(isCompact ? 18 : 28),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.12),
-                  offset: const Offset(0, 2),
-                  blurRadius: 6,
-                  spreadRadius: 0,
-                ),
-              ],
+              borderRadius: BorderRadius.circular(buttonRadius),
             ),
             child: Center(
-              child: Text(
-                text,
-                style: GoogleFonts.outfit(
-                  color: textColor,
-                  fontSize: fontSize ?? (isCompact ? 22 : 32),
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.3,
+              child: Padding(
+                padding: isWide
+                    ? const EdgeInsets.only(left: 24.0)
+                    : EdgeInsets.zero,
+                child: Align(
+                  alignment: isWide ? Alignment.centerLeft : Alignment.center,
+                  child: Text(
+                    text,
+                    style: GoogleFonts.outfit(
+                      color: textColor,
+                      fontSize: fontSize ?? (isCompact ? 22 : 36),
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0,
+                    ),
+                  ),
                 ),
               ),
             ),

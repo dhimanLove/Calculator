@@ -92,7 +92,7 @@ class CalculatorScreen extends StatelessWidget {
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
       alignment: Alignment.bottomRight,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -105,14 +105,14 @@ class CalculatorScreen extends StatelessWidget {
             child: Text(
               controller.userQuestion.isEmpty ? '' : controller.userQuestion,
               style: GoogleFonts.outfit(
-                fontSize: 32,
+                fontSize: 40,
                 color: expressionTextColor,
                 fontWeight: FontWeight.w300,
               ),
               textAlign: TextAlign.right,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           // Result
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -122,9 +122,9 @@ class CalculatorScreen extends StatelessWidget {
                   ? (controller.userQuestion.isEmpty ? '0' : '')
                   : controller.userAnswer,
               style: GoogleFonts.outfit(
-                fontSize: 56,
+                fontSize: 72,
                 color: displayTextColor,
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.w300,
               ),
               textAlign: TextAlign.right,
             ),
@@ -136,38 +136,39 @@ class CalculatorScreen extends StatelessWidget {
 
   Widget _buildKeypad(
       BuildContext context, CalculatorController controller, bool isDark) {
-    // 5-column Premium Layout
+    // iOS-style 4-column Layout
     final buttons = [
-      ['MC', 'MR', 'M+', 'M-', 'MS'],
-      ['sin', 'cos', 'tan', 'e', '÷'],
-      ['ln', 'log', '1/x', '√', '×'],
-      ['7', '8', '9', '(', '-'],
-      ['4', '5', '6', ')', '+'],
-      ['1', '2', '3', '%', '='],
-      ['C', '0', '.', '±', '⌫'],
+      ['AC', '±', '%', '÷'],
+      ['7', '8', '9', '×'],
+      ['4', '5', '6', '-'],
+      ['1', '2', '3', '+'],
+      ['0', '.', '='], // Special row with 0 spanning 2 columns
     ];
 
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
         color: isDark
             ? AppColors.darkKeypadBackground
             : AppColors.lightKeypadBackground,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(32),
-          topRight: Radius.circular(32),
-        ),
       ),
       child: Column(
         children: buttons.asMap().entries.map((entry) {
+          final rowIndex = entry.key;
           final row = entry.value;
+
           return Expanded(
-            child: Row(
-              children: row.map((buttonText) {
-                return Expanded(
-                  child: _buildButton(context, buttonText, controller, isDark),
-                );
-              }).toList(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(
+                children: _buildRowButtons(
+                  context,
+                  row,
+                  controller,
+                  isDark,
+                  isLastRow: rowIndex == buttons.length - 1,
+                ),
+              ),
             ),
           );
         }).toList(),
@@ -175,58 +176,72 @@ class CalculatorScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(BuildContext context, String buttonText,
-      CalculatorController controller, bool isDark) {
+  List<Widget> _buildRowButtons(
+    BuildContext context,
+    List<String> row,
+    CalculatorController controller,
+    bool isDark, {
+    bool isLastRow = false,
+  }) {
+    List<Widget> buttons = [];
+
+    for (int i = 0; i < row.length; i++) {
+      final buttonText = row[i];
+
+      // Special handling for "0" button - spans 2 columns
+      if (buttonText == '0' && isLastRow) {
+        buttons.add(
+          Expanded(
+            flex: 2,
+            child: _buildButton(context, buttonText, controller, isDark,
+                isWide: true),
+          ),
+        );
+      } else {
+        buttons.add(
+          Expanded(
+            child: _buildButton(context, buttonText, controller, isDark),
+          ),
+        );
+      }
+    }
+
+    return buttons;
+  }
+
+  Widget _buildButton(
+    BuildContext context,
+    String buttonText,
+    CalculatorController controller,
+    bool isDark, {
+    bool isWide = false,
+  }) {
     Color bgColor;
     Color txtColor;
-    double fontSize = 24;
+    double fontSize = 36;
 
-    // Determine colors based on type
+    // Determine colors based on button type - iOS style
     bool isOperator = ['÷', '×', '-', '+', '='].contains(buttonText);
-    bool isFunction = [
-      'C',
-      '⌫',
-      '±',
-      '%',
-      '(',
-      ')',
-      '√',
-      '1/x',
-      'MC',
-      'MR',
-      'M+',
-      'M-',
-      'MS',
-      'sin',
-      'cos',
-      'tan',
-      'ln',
-      'log',
-      'e',
-      'π',
-      '^',
-      '!'
-    ].contains(buttonText);
+    bool isFunction = ['AC', '±', '%'].contains(buttonText);
 
     if (isOperator) {
+      // Operators get vibrant orange background with white text
       bgColor =
           isDark ? AppColors.darkButtonOperator : AppColors.lightButtonOperator;
-      txtColor = AppColors.darkAccent; // Use accent color for operators
-      if (buttonText == '=') {
-        bgColor = AppColors.darkAccent;
-        txtColor = Colors.white;
-      }
+      txtColor =
+          isDark ? AppColors.darkTextOperator : AppColors.lightTextOperator;
+      fontSize = 40; // Slightly larger for operators
     } else if (isFunction) {
+      // Functions (AC, ±, %) get light gray background
       bgColor =
           isDark ? AppColors.darkButtonFunction : AppColors.lightButtonFunction;
       txtColor =
           isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-      fontSize = 20; // Smaller font for functions
+      fontSize = 32;
     } else {
-      // Numbers
-      bgColor = isDark
-          ? AppColors.darkButtonBackground
-          : AppColors.lightButtonBackground;
+      // Numbers and decimal point get dark gray (dark mode) or light gray (light mode)
+      bgColor =
+          isDark ? AppColors.darkButtonNumber : AppColors.lightButtonNumber;
       txtColor =
           isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
     }
@@ -235,8 +250,9 @@ class CalculatorScreen extends StatelessWidget {
       text: buttonText,
       backgroundColor: bgColor,
       textColor: txtColor,
-      isCompact: true,
+      isCompact: false,
       fontSize: fontSize,
+      isWide: isWide,
       onPressed: () {
         controller.onButtonPressed(buttonText);
       },

@@ -26,20 +26,10 @@ class CalculatorController extends ChangeNotifier {
   }
 
   void onButtonPressed(String buttonText) {
-    if (buttonText == 'C') {
+    if (buttonText == 'AC') {
+      // iOS-style AC - just clears current input
       _userQuestion = '';
       _userAnswer = '';
-    } else if (buttonText == 'AC') {
-      _userQuestion = '';
-      _userAnswer = '';
-      _history.clear();
-      _memory = 0.0;
-    } else if (buttonText == 'CE') {
-      _userQuestion = '';
-    } else if (buttonText == '⌫') {
-      if (_userQuestion.isNotEmpty) {
-        _userQuestion = _userQuestion.substring(0, _userQuestion.length - 1);
-      }
     } else if (buttonText == '±') {
       _toggleSign();
     } else if (buttonText == '=') {
@@ -49,38 +39,6 @@ class CalculatorController extends ChangeNotifier {
           _addToHistory(_userQuestion, _userAnswer);
         }
       }
-    } else if (buttonText == 'MC') {
-      _memory = 0.0;
-    } else if (buttonText == 'MR') {
-      _userQuestion += _formatResult(_memory);
-    } else if (buttonText == 'M+') {
-      _handleMemoryOperation((val) => _memory += val);
-    } else if (buttonText == 'M-') {
-      _handleMemoryOperation((val) => _memory -= val);
-    } else if (buttonText == 'MS') {
-      _handleMemoryOperation((val) => _memory = val);
-    } else if (buttonText == '1/x') {
-      _userQuestion = '1/($_userQuestion)';
-      // Auto calculate for immediate feedback style if preferred, or just build expression
-      // For now, let's build expression to be safe
-    } else if (buttonText == 'sin' ||
-        buttonText == 'cos' ||
-        buttonText == 'tan') {
-      _handleTrigFunction(buttonText);
-    } else if (buttonText == 'ln' || buttonText == 'log') {
-      _handleLogFunction(buttonText);
-    } else if (buttonText == '√') {
-      _userQuestion += '√(';
-    } else if (buttonText == 'x²') {
-      _userQuestion += '^2';
-    } else if (buttonText == 'xʸ') {
-      _userQuestion += '^';
-    } else if (buttonText == 'π') {
-      _userQuestion += 'π';
-    } else if (buttonText == 'e') {
-      _userQuestion += 'e';
-    } else if (buttonText == '!') {
-      _handleFactorial();
     } else {
       // If there's an answer and user starts typing a number, start fresh
       if (_userAnswer.isNotEmpty &&
