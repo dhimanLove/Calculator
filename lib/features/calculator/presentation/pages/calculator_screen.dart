@@ -88,7 +88,8 @@ class CalculatorScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       alignment: Alignment.bottomRight,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment:
+            MainAxisAlignment.center, // Center content vertically
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Flexible(
@@ -100,7 +101,7 @@ class CalculatorScreen extends StatelessWidget {
                 controller.userQuestion.isEmpty ? '' : controller.userQuestion,
                 style: TextStyle(
                   fontFamily: 'Chillax',
-                  fontSize: 40, // Base font size
+                  fontSize: 36, // Base font size
                   color: expressionTextColor,
                   fontWeight: FontWeight.w300,
                   height: 1.2,
@@ -151,6 +152,10 @@ class CalculatorScreen extends StatelessWidget {
         color: isDark
             ? AppColors.darkKeypadBackground
             : AppColors.lightKeypadBackground,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(40),
+          topRight: Radius.circular(40),
+        ),
       ),
       child: Column(
         children: buttons.asMap().entries.map((entry) {
